@@ -32,7 +32,7 @@ logger.Info("Пользователь вошел", userID)
 ```go
 package main
 
-import "github.com/ikermy/AiR_Logger/pkg/logger"
+import "github.com/ikermy/AiR_Logger/v2/pkg/logger"
 
 func main() {
 	logger.Set("./logs/app.log").Apply()

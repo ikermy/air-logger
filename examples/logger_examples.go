@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/ikermy/AiR_Logger/pkg/logger"
+	"github.com/ikermy/AiR_Logger/v2/pkg/logger"
 )
 
 func main() {
