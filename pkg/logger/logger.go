@@ -56,6 +56,7 @@ type LoggerConfig struct {
 	compress   bool
 	minLevel   LogLevel
 	caller     bool
+	stdoutOnly bool
 }
 
 var generalWriter io.Writer
@@ -66,16 +67,30 @@ var timeCacheMu sync.Mutex
 var timeCacheUnix int64
 var timeCacheValue string
 
-// Set инициализирует конфигуратор логгера и возвращает конфиг для fluent API
-func Set(path string) *LoggerConfig {
+func defaultConfig() *LoggerConfig {
 	return &LoggerConfig{
-		filepath:   path,
 		maxSize:    1,
 		maxBackups: 3,
 		maxAge:     30,
 		compress:   true,
 		minLevel:   INFO, // По умолчанию отключены DEBUG логи
 		caller:     true,
+	}
+}
+
+// SetPatch инициализирует конфигуратор файлового логгера и возвращает конфиг для fluent API
+func SetPatch(path string) *LoggerConfig {
+	config := defaultConfig()
+	config.filepath = path
+	return config
+}
+
+// StdOut инициализирует конфигуратор логгера только для stdout
+func StdOut() *LoggerConfig {
+	return &LoggerConfig{
+		minLevel:   INFO,
+		caller:     true,
+		stdoutOnly: true,
 	}
 }
 
@@ -117,6 +132,19 @@ func (lc *LoggerConfig) WithCaller(enabled bool) *LoggerConfig {
 
 // Apply применяет конфигурацию и инициализирует логгер
 func (lc *LoggerConfig) Apply() {
+	currentLogLevel = lc.minLevel
+	currentUseCaller = lc.caller
+
+	if logFile != nil {
+		_ = logFile.close()
+		logFile = nil
+	}
+
+	if lc.stdoutOnly {
+		generalWriter = os.Stdout
+		return
+	}
+
 	logFile = &RotatingWriter{
 		Filename:   lc.filepath,
 		MaxSize:    lc.maxSize,
@@ -124,8 +152,6 @@ func (lc *LoggerConfig) Apply() {
 		MaxAge:     lc.maxAge,
 		Compress:   lc.compress,
 	}
-	currentLogLevel = lc.minLevel
-	currentUseCaller = lc.caller
 
 	if err := logFile.openFile(); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to open log file: %v\n", err)
@@ -544,4 +570,3 @@ func (rw *RotatingWriter) close() error {
 	}
 	return nil
 }
-

@@ -13,7 +13,7 @@ func TestRotatingWriterBasic(t *testing.T) {
 	logPath := filepath.Join(tmpDir, "test.log")
 
 	// Инициализируем логгер с builder pattern
-	Set(logPath).
+	SetPatch(logPath).
 		WithLogLevel(INFO).
 		WithMaxSize(1).
 		WithMaxBackups(3).
@@ -60,7 +60,7 @@ func TestRotatingWriterWithDebug(t *testing.T) {
 	logPath := filepath.Join(tmpDir, "debug.log")
 
 	// Включаем DEBUG логирование
-	Set(logPath).
+	SetPatch(logPath).
 		WithLogLevel(DEBUG).
 		Apply()
 	defer Close()
@@ -86,7 +86,7 @@ func TestRotatingWriterLogLevelFiltering(t *testing.T) {
 	logPath := filepath.Join(tmpDir, "level.log")
 
 	// Устанавливаем минимальный уровень WARNING
-	Set(logPath).
+	SetPatch(logPath).
 		WithLogLevel(WARNING).
 		Apply()
 	defer Close()
@@ -177,7 +177,7 @@ func TestUserIDExtraction(t *testing.T) {
 	tmpDir := t.TempDir()
 	logPath := filepath.Join(tmpDir, "userid.log")
 
-	Set(logPath).
+	SetPatch(logPath).
 		WithLogLevel(INFO).
 		Apply()
 	defer Close()
@@ -203,7 +203,7 @@ func TestBuilderChaining(t *testing.T) {
 	logPath := filepath.Join(tmpDir, "builder.log")
 
 	// Тестируем fluent API
-	config := Set(logPath).
+	config := SetPatch(logPath).
 		WithLogLevel(DEBUG).
 		WithMaxSize(5).
 		WithMaxBackups(5).
@@ -233,7 +233,7 @@ func TestLoggerWithoutCaller(t *testing.T) {
 	tmpDir := t.TempDir()
 	logPath := filepath.Join(tmpDir, "nocaller.log")
 
-	Set(logPath).
+	SetPatch(logPath).
 		WithLogLevel(INFO).
 		WithCaller(false).
 		Apply()
@@ -256,6 +256,22 @@ func TestLoggerWithoutCaller(t *testing.T) {
 	}
 }
 
+func TestStdOutMode(t *testing.T) {
+	StdOut().
+		WithLogLevel(INFO).
+		WithCaller(false).
+		Apply()
+	defer Close()
+
+	if logFile != nil {
+		t.Fatal("logFile should be nil in stdout mode")
+	}
+
+	if generalWriter == nil {
+		t.Fatal("generalWriter should be configured in stdout mode")
+	}
+}
+
 func contains(s, substr string) bool {
 	for i := 0; i <= len(s)-len(substr); i++ {
 		if s[i:i+len(substr)] == substr {
@@ -264,4 +280,3 @@ func contains(s, substr string) bool {
 	}
 	return false
 }
-

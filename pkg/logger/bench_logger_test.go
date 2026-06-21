@@ -121,4 +121,15 @@ func BenchmarkDebugDisabled(b *testing.B) {
 	}
 }
 
+func BenchmarkStdOutApply(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		StdOut().
+			WithLogLevel(INFO).
+			WithCaller(false).
+			Apply()
+	}
+	Close()
+}
+
 // go test -bench=BenchmarkLogMessageConcat -benchmem -run=^$
