@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/ikermy/AiR_Logger/v2/pkg/logger"
+	"github.com/ikermy/air_logger/v2/pkg/logger"
 )
 
 func main() {
 	// ============ Пример 1: Базовое использование ============
 	println("\n=== Пример 1: Базовое использование ===")
-	logger.Set("./logs/example1.log").Apply()
+	logger.SetPatch("./logs/example1.log").Apply()
 	defer logger.Close()
 
 	logger.Debug("Это сообщение DEBUG - НЕ будет залогировано")
@@ -19,7 +19,7 @@ func main() {
 
 	// ============ Пример 2: С включенным DEBUG ============
 	println("\n=== Пример 2: С включенным DEBUG ===")
-	logger.Set("./logs/example2.log").
+	logger.SetPatch("./logs/example2.log").
 		WithLogLevel(logger.DEBUG).
 		Apply()
 	defer logger.Close()
@@ -31,7 +31,7 @@ func main() {
 
 	// ============ Пример 3: Только WARNING и выше ============
 	println("\n=== Пример 3: Только WARNING и выше ===")
-	logger.Set("./logs/example3.log").
+	logger.SetPatch("./logs/example3.log").
 		WithLogLevel(logger.WARNING).
 		Apply()
 	defer logger.Close()
@@ -45,12 +45,12 @@ func main() {
 
 	// ============ Пример 4: Полная конфигурация ============
 	println("\n=== Пример 4: Полная конфигурация ===")
-	logger.Set("./logs/app.log").
+	logger.SetPatch("./logs/app.log").
 		WithLogLevel(logger.INFO).
-		WithMaxSize(10).           // 10 MB
-		WithMaxBackups(5).         // Держать 5 резервных копий
-		WithMaxAge(90).            // Хранить 90 дней
-		WithCompress(true).        // Сжимать архивы
+		WithMaxSize(10).    // 10 MB
+		WithMaxBackups(5).  // Держать 5 резервных копий
+		WithMaxAge(90).     // Хранить 90 дней
+		WithCompress(true). // Сжимать архивы
 		Apply()
 	defer logger.Close()
 
@@ -66,7 +66,7 @@ func main() {
 	println("\n=== Пример 5: Сохранение конфига ============")
 
 	// Создаем конфигурацию
-	config := logger.Set("./logs/example5.log").
+	config := logger.SetPatch("./logs/example5.log").
 		WithLogLevel(logger.DEBUG).
 		WithMaxSize(5)
 
@@ -79,7 +79,19 @@ func main() {
 
 	logger.Close()
 
-	println("\n✅ Все примеры выполнены!")
-	println("Проверьте папку ./logs/ для просмотра созданных логов")
-}
+	// ============ Пример 6: Docker / только stdout ============
+	println("\n=== Пример 6: Docker / только stdout ===")
+	logger.StdOut().
+		WithLogLevel(logger.INFO).
+		WithCaller(false).
+		Apply()
+	defer logger.Close()
 
+	logger.Info("Лог только в stdout для Promtail")
+	logger.Warn("Файловая ротация в этом режиме отключена")
+
+	logger.Close()
+
+	println("\n✅ Все примеры выполнены!")
+	println("Проверьте папку ./logs/ для файловых режимов и stdout для Docker-режима")
+}

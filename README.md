@@ -1,6 +1,6 @@
 # AiR Logger
 
-**Version:** `2.0.0`  
+**Version:** `2.1.1`  
 **License:** `MIT` (свободная лицензия)
 
 <p align="center">
@@ -13,7 +13,7 @@
 
 - встроенная ротация файлов
 - уровни логирования `DEBUG`, `INFO`, `WARNING`, `ERROR`, `FATAL`
-- fluent API через `Set(...).With...().Apply()`
+- fluent API через `SetPatch(...).With...().Apply()` и `StdOut().With...().Apply()`
 - опциональное отключение `caller` для ускорения
 - специальная поддержка `userID`, если он передан **последним аргументом** как `uint32`
 
@@ -32,10 +32,10 @@ logger.Info("Пользователь вошел", userID)
 ```go
 package main
 
-import "github.com/ikermy/AiR_Logger/v2/pkg/logger"
+import "github.com/ikermy/air_logger/v2/pkg/logger"
 
 func main() {
-	logger.Set("./logs/app.log").Apply()
+logger.SetPatch("./logs/app.log").Apply()
 	defer logger.Close()
 
 	logger.Info("service started")
@@ -49,7 +49,7 @@ func main() {
 ## Конфигурация
 
 ```go
-logger.Set("./logs/app.log").
+logger.SetPatch("./logs/app.log").
 	WithLogLevel(logger.INFO).
 	WithMaxSize(10).
 	WithMaxBackups(5).
@@ -68,6 +68,17 @@ logger.Set("./logs/app.log").
 - `WithCompress(enabled)`
 - `WithCaller(enabled)`
 
+Для режима только stdout:
+
+```go
+logger.StdOut().
+	WithLogLevel(logger.INFO).
+	WithCaller(false).
+	Apply()
+```
+
+В режиме `StdOut()` доступны только настройки уровня логирования и caller. Методы `WithMaxSize`, `WithMaxBackups`, `WithMaxAge`, `WithCompress` относятся только к файловому режиму через `SetPatch(...)`.
+
 ## Формат логов
 
 С `caller`:
@@ -84,7 +95,7 @@ logger.Set("./logs/app.log").
 
 ## Производительность
 
-Актуальные локальные замеры:
+Актуальные локальные замеры на моих попугаях:
 
 | Сценарий | Time | Memory | Allocs |
 |---|---:|---:|---:|
@@ -92,14 +103,28 @@ logger.Set("./logs/app.log").
 | `BenchmarkWriteLogFullPath` | 548.1 ns/op | 352 B/op | 5 allocs/op |
 | `BenchmarkWriteLogNoCaller` | 125.9 ns/op | 101 B/op | 2 allocs/op |
 | `BenchmarkDebugDisabled` | 12.08 ns/op | 8 B/op | 0 allocs/op |
+| `BenchmarkStdOutApply` | 4.044 ns/op | 0 B/op | 0 allocs/op |
 
 Для максимально быстрого режима:
 
 ```go
-logger.Set("./logs/app.log").
+logger.SetPatch("./logs/app.log").
 	WithCaller(false).
 	Apply()
 ```
+
+## Docker
+
+Для контейнеров используйте вывод только в stdout:
+
+```go
+logger.StdOut().
+	WithLogLevel(logger.INFO).
+	WithCaller(false).
+	Apply()
+```
+
+В этом режиме логгер не создаёт файл и не использует ротацию.
 
 ## Выборка логов пользователя
 

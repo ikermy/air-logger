@@ -1,3 +1,3 @@
-module github.com/ikermy/AiR_Logger/v2
+module github.com/ikermy/air_logger/v2
 
 go 1.25
