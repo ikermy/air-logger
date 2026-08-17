@@ -94,6 +94,22 @@ func StdOut() *LoggerConfig {
 	}
 }
 
+// FromString вспомогательный хелпер string to LogLevel
+func (lc *LoggerConfig) FromString(level string) LogLevel {
+	switch level {
+	case "debug":
+		return DEBUG
+	case "info":
+		return INFO
+	case "warn", "warning":
+		return WARNING
+	case "error":
+		return ERROR
+	default:
+		return INFO
+	}
+}
+
 // WithLogLevel устанавливает минимальный уровень логирования
 func (lc *LoggerConfig) WithLogLevel(level LogLevel) *LoggerConfig {
 	lc.minLevel = level
@@ -168,39 +184,39 @@ func Close() {
 }
 
 // --- публичные методы ---
-func Infoln(args ...interface{})               { 
+func Infoln(args ...interface{}) {
 	if currentLogLevel <= INFO {
-		logMessage("[INFO]", 2, args...) 
+		logMessage("[INFO]", 2, args...)
 	}
 }
 
-func Info(format string, args ...interface{})  { 
+func Info(format string, args ...interface{}) {
 	if currentLogLevel <= INFO {
 		logMessagef(format, "[INFO]", 2, args...)
 	}
 }
 
-func Error(format string, args ...interface{}) { 
+func Error(format string, args ...interface{}) {
 	if currentLogLevel <= ERROR {
 		logMessagef(format, "[ERROR]", 2, args...)
 	}
 }
 
-func Warn(format string, args ...interface{})  { 
+func Warn(format string, args ...interface{}) {
 	if currentLogLevel <= WARNING {
 		logMessagef(format, "[WARNING]", 2, args...)
 	}
 }
 
-func Debug(format string, args ...interface{}) { 
+func Debug(format string, args ...interface{}) {
 	if currentLogLevel <= DEBUG {
 		logMessagef(format, "[DEBUG]", 2, args...)
 	}
 }
 
-func Fatal(args ...interface{})                { 
+func Fatal(args ...interface{}) {
 	logMessage("[FATAL]", 2, args...)
-	os.Exit(1) 
+	os.Exit(1)
 }
 
 func Fatalf(format string, args ...interface{}) {
