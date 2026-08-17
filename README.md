@@ -1,6 +1,6 @@
 # AiR Logger
 
-**Version:** `2.1.1`  
+**Version:** `2`  
 **License:** `MIT` (свободная лицензия)
 
 <p align="center">
