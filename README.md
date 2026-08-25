@@ -3,9 +3,7 @@
 **Version:** `2`  
 **License:** `MIT` (свободная лицензия)
 
-<p align="center">
-  <img src="logo.png" alt="AiR Logger" width="220">
-</p>
+![air-logger](logo.png)
 
 Быстрый логгер для проекта **MarusiaAI** без внешних зависимостей.
 
@@ -32,7 +30,7 @@ logger.Info("Пользователь вошел", userID)
 ```go
 package main
 
-import "github.com/ikermy/air_logger/v2/pkg/logger"
+import "github.com/ikermy/air-logger/v2/pkg/logger"
 
 func main() {
 logger.SetPatch("./logs/app.log").Apply()
